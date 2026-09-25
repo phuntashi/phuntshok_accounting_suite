@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phuntshok Accounting Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Financial Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+            .main-content { padding: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased h-screen flex overflow-hidden">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-30 hidden lg:hidden"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 bg-slate-900 text-slate-300 flex flex-col z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out border-r border-slate-800 shadow-xl no-print">
+        
+        <!-- App Header Logo -->
+        <div class="p-5 flex items-center justify-between border-b border-slate-800 bg-slate-950/60">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-900/40">
+                    P
+                </div>
+                <div>
+                    <h1 class="font-bold text-white text-base leading-tight">Phuntshok</h1>
+                    <p class="text-[11px] text-emerald-400 font-semibold tracking-wider uppercase">Accounting Suite</p>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav id="mainNav" class="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar">
+            
+            <button data-page="dashboard" onclick="navigateTo('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">📊</span> <span>Dashboard</span>
+            </button>
+
+            <div class="px-3 pt-4 pb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">MASTER DATA</div>
+
+            <button data-page="accounts" onclick="navigateTo('accounts')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">📚</span> <span>Chart of Accounts</span>
+            </button>
+            <button data-page="customers" onclick="navigateTo('customers')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">👥</span> <span>Customers</span>
+            </button>
+            <button data-page="suppliers" onclick="navigateTo('suppliers')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">🏢</span> <span>Suppliers & Vendors</span>
+            </button>
+            <button data-page="products" onclick="navigateTo('products')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">📦</span> <span>Products & Inventory</span>
+            </button>
+
+            <div class="px-3 pt-4 pb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">TRANSACTIONS</div>
+
+            <button data-page="sales" onclick="navigateTo('sales')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">🧾</span> <span>Sales Invoices</span>
+            </button>
+            <button data-page="purchases" onclick="navigateTo('purchases')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">🛒</span> <span>Purchase Orders/Bills</span>
+            </button>
+            <button data-page="receipts" onclick="navigateTo('receipts')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">💵</span> <span>Customer Receipts</span>
+            </button>
+            <button data-page="payments" onclick="navigateTo('payments')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">💸</span> <span>Supplier Payments</span>
+            </button>
+            <button data-page="journal" onclick="navigateTo('journal')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">📒</span> <span>Journal Entries</span>
+            </button>
+
+            <div class="px-3 pt-4 pb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">FINANCIAL REPORTS</div>
+
+            <button data-page="ledger" onclick="navigateTo('ledger')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">📖</span> <span>General Ledger</span>
+            </button>
+            <button data-page="trial" onclick="navigateTo('trial')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">⚖️</span> <span>Trial Balance</span>
+            </button>
+            <button data-page="profit-loss" onclick="navigateTo('profit-loss')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">📈</span> <span>Profit & Loss</span>
+            </button>
+            <button data-page="balance-sheet" onclick="navigateTo('balance-sheet')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">🏦</span> <span>Balance Sheet</span>
+            </button>
+
+            <div class="px-3 pt-4 pb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">SYSTEM</div>
+
+            <button data-page="settings" onclick="navigateTo('settings')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">⚙️</span> <span>Settings & Tax</span>
+            </button>
+            <button data-page="users" onclick="navigateTo('users')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white">
+                <span class="text-lg">👤</span> <span>Users & Roles</span>
+            </button>
+        </nav>
+
+        <!-- Sidebar Footer / Logout option -->
+        <div class="p-4 border-t border-slate-800 bg-slate-950/40">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                    <div class="w-8 h-8 rounded-full bg-emerald-700/40 text-emerald-300 font-bold flex items-center justify-center text-xs border border-emerald-500/30">
+                        PA
+                    </div>
+                    <div class="overflow-hidden">
+                        <p id="sbUserName" class="text-xs font-semibold text-white truncate">Phuntshok Admin</p>
+                        <p class="text-[10px] text-slate-400 truncate">Administrator</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-900/40 hover:text-rose-300 text-xs font-medium text-slate-300 transition-colors border border-slate-700">
+                <span>🚪</span> <span>Sign Out</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <!-- TOP BAR -->
+        <header class="bg-white border-b border-slate-200 h-16 px-4 lg:px-8 flex items-center justify-between z-10 no-print">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <div>
+                    <h2 id="pageTitle" class="text-xl font-bold text-slate-800 leading-none">Dashboard</h2>
+                    <p id="pageSubtitle" class="text-xs text-slate-500 mt-1">Real-time accounting analytics and store metrics</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="resetToSampleData()" class="text-xs bg-slate-100 hover:bg-amber-50 hover:text-amber-700 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg font-medium transition-colors hidden sm:block">
+                    ↺ Reset Sample Data
+                </button>
+                <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+                <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+                    <span class="text-xs font-semibold text-slate-600 px-2" id="headerCurrencyBadge">Nu. (BTN)</span>
+                    <button onclick="navigateTo('settings')" class="text-slate-400 hover:text-slate-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT VIEW -->
+        <main id="mainContent" class="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar bg-slate-100">
+            <!-- Dynamic page contents loaded via JS -->
+        </main>
+    </div>
+
+    <!-- GLOBAL MODAL CONTAINER -->
+    <div id="modalBackdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div id="modalBox" class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 id="modalTitle" class="font-bold text-slate-800 text-lg">Modal Title</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 rounded-lg p-1 hover:bg-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="modalBody" class="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                <!-- Modal Body JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION LOGIC & STORAGE -->
+    <script>
+        // Core State Definition & Initial Sample Dataset
+        const sampleState = {
+            settings: {
+                companyName: "Phuntshok Retail & Trading",
+                taxNumber: "TPN-8849201",
+                currency: "Nu.",
+                currencyCode: "BTN",
+                taxRate: 5.0, // 5% Sales Tax
+                address: "Norzin Lam, Thimphu, Bhutan"
+            },
+            accounts: [
+                { code: '1010', name: 'Cash on Hand', type: 'Asset', category: 'Current Asset', balance: 45000 },
+                { code: '1020', name: 'BNB Bank Account', type: 'Asset', category: 'Current Asset', balance: 185000 },
+                { code: '1100', name: 'Accounts Receivable', type: 'Asset', category: 'Current Asset', balance: 35000 },
+                { code: '1200', name: 'Inventory Asset', type: 'Asset', category: 'Current Asset', balance: 42000 },
+                { code: '1500', name: 'Store Furniture & Fixtures', type: 'Asset', category: 'Fixed Asset', balance: 120000 },
+                { code: '2010', name: 'Accounts Payable', type: 'Liability', category: 'Current Liability', balance: 18500 },
+                { code: '2020', name: 'Sales Tax Payable', type: 'Liability', category: 'Current Liability', balance: 2150 },
+                { code: '3010', name: 'Owner Capital', type: 'Equity', category: 'Equity', balance: 350000 },
+                { code: '3020', name: 'Retained Earnings', type: 'Equity', category: 'Equity', balance: 30000 },
+                { code: '4010', name: 'Retail Sales Income', type: 'Revenue', category: 'Operating Income', balance: 52000 },
+                { code: '5010', name: 'Cost of Goods Sold (COGS)', type: 'Expense', category: 'Cost of Sales', balance: 24000 },
+                { code: '5020', name: 'Store Rent Expense', type: 'Expense', category: 'Operating Expense', balance: 15000 },
+                { code: '5030', name: 'Electricity & Utilities', type: 'Expense', category: 'Operating Expense', balance: 3650 }
+            ],
+            customers: [
+                { id: 'CUST-101', name: 'Tashi Commercial Ltd', contact: 'Tashi Dorji', phone: '+975-17112233', email: 'tashi@commercial.bt', balance: 20000 },
+                { id: 'CUST-102', name: 'Karma Stationery Shop', contact: 'Karma Wangmo', phone: '+975-17556677', email: 'karma@stationery.bt', balance: 15000 }
+            ],
+            suppliers: [
+                { id: 'SUPP-201', name: 'Himalayan Traders Pvt', contact: 'Pema Rinzin', phone: '+975-02334455', email: 'orders@himalayan.bt', balance: 18500 }
+            ],
+            products: [
+                { id: 'PROD-01', code: 'TEA-01', name: 'Bhutan Organic Green Tea (250g)', category: 'Beverages', price: 350, cost: 200, stock: 65, minStock: 15 },
+                { id: 'PROD-02', code: 'CRAFT-02', name: 'Handcrafted Wooden Cup (Dapa)', category: 'Crafts', price: 1200, cost: 700, stock: 8, minStock: 10 },
+                { id: 'PROD-03', code: 'HONEY-03', name: 'Bumthang Natural Honey (500ml)', category: 'Food', price: 650, cost: 400, stock: 24, minStock: 5 }
+            ],
+            salesInvoices: [
+                { id: 'INV-1001', customerId: 'CUST-101', date: '2026-09-20', items: [{ productId: 'PROD-01', qty: 20, price: 350, total: 7000 }], subtotal: 7000, tax: 350, total: 7350, status: 'Unpaid' },
+                { id: 'INV-1002', customerId: 'CUST-102', date: '2026-09-22', items: [{ productId: 'PROD-02', qty: 10, price: 1200, total: 12000 }], subtotal: 12000, tax: 600, total: 12600, status: 'Paid' }
+            ],
+            purchaseBills: [
+                { id: 'BILL-5001', supplierId: 'SUPP-201', date: '2026-09-15', items: [{ productId: 'PROD-01', qty: 50, cost: 200, total: 10000 }], total: 10000, status: 'Pending' }
+            ],
+            receipts: [
+                { id: 'REC-301', customerId: 'CUST-102', amount: 12600, date: '2026-09-23', method: 'BNB Bank Transfer', ref: 'TXN-99812' }
+            ],
+            payments: [
+                { id: 'PAY-401', supplierId: 'SUPP-201', amount: 5000, date: '2026-09-18', method: 'BNB Bank Transfer', ref: 'TXN-11029' }
+            ],
+            journalEntries: [
+                { id: 'JRN-001', date: '2026-09-01', desc: 'Capital infusion by Owner', debitCode: '1020', creditCode: '3010', amount: 350000 },
+                { id: 'JRN-002', date: '2026-09-05', desc: 'Paid monthly store rent', debitCode: '5020', creditCode: '1020', amount: 15000 }
+            ],
+            users: [
+                { name: 'Phuntshok Admin', email: 'admin@phuntshok.com', role: 'Administrator', status: 'Active' },
+                { name: 'Sonam Norbu', email: 'sonam@phuntshok.com', role: 'Accountant', status: 'Active' }
+            ]
+        };
+
+        // State Manager
+        let appState = loadState();
+
+        function loadState() {
+            const stored = localStorage.getItem('phuntshok_suite_db');
+            if (stored) {
+                try { return JSON.parse(stored); } catch (e) { console.error("Error reading localStorage", e); }
+            }
+            return JSON.parse(JSON.stringify(sampleState));
+        }
+
+        function saveState() {
+            localStorage.setItem('phuntshok_suite_db', JSON.stringify(appState));
+        }
+
+        function resetToSampleData() {
+            if (confirm("Reset all financial records back to initial sample state? Any new transactions will be lost.")) {
+                appState = JSON.parse(JSON.stringify(sampleState));
+                saveState();
+                navigateTo(currentPage);
+            }
+        }
+
+        function handleLogout() {
+            if (confirm("Are you sure you want to sign out of Phuntshok Accounting Suite?")) {
+                alert("Session closed safely. Click OK to reload.");
+                location.reload();
+            }
+        }
+
+        // Active Navigation Page
+        let currentPage = 'dashboard';
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebarBackdrop').classList.toggle('hidden');
+        }
+
+        // Currency Formatting Helper
+        function fmt(amount) {
+            const symbol = appState.settings.currency || 'Nu.';
+            const num = Number(amount || 0);
+            return `${symbol} ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // Post Journal / Ledger Transaction Engine
+        function postDoubleEntry(date, desc, debitCode, creditCode, amount) {
+            const id = 'JRN-' + String(appState.journalEntries.length + 1).padStart(3, '0');
+            
+            // Add to Journal Entries
+            appState.journalEntries.unshift({ id, date, desc, debitCode, creditCode, amount });
+
+            // Post to Account Balances
+            const debitAcc = appState.accounts.find(a => a.code === debitCode);
+            const creditAcc = appState.accounts.find(a => a.code === creditCode);
+
+            if (debitAcc) {
+                if (['Asset', 'Expense'].includes(debitAcc.type)) debitAcc.balance += amount;
+                else debitAcc.balance -= amount;
+            }
+
+            if (creditAcc) {
+                if (['Liability', 'Equity', 'Revenue'].includes(creditAcc.type)) creditAcc.balance += amount;
+                else creditAcc.balance -= amount;
+            }
+
+            saveState();
+        }
+
+        // Router & View Switcher
+        function navigateTo(pageId) {
+            currentPage = pageId;
+
+            // Highlight active button
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-page') === pageId) {
+                    btn.className = "nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold bg-emerald-600 text-white shadow-md shadow-emerald-900/30";
+                } else {
+                    btn.className = "nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white";
+                }
+            });
+
+            // Set Page Title Header
+            const titleMap = {
+                'dashboard': ['Dashboard Overview', 'Real-time financial performance and KPI metrics'],
+                'accounts': ['Chart of Accounts', 'Master double-entry ledger accounts hierarchy'],
+                'customers': ['Customer Directory', 'Client billing accounts and aging receivables'],
+                'suppliers': ['Suppliers & Vendors', 'Vendor relations and accounts payable'],
+                'products': ['Products & Inventory', 'Stock tracking, reorder alerts, and item margins'],
+                'sales': ['Sales Invoices', 'Customer sales billing and invoicing'],
+                'purchases': ['Purchase Orders & Bills', 'Vendor bills and incoming inventory log'],
+                'receipts': ['Customer Receipts', 'Log incoming invoice payments from clients'],
+                'payments': ['Supplier Payments', 'Disbursements and vendor bill payments'],
+                'journal': ['General Journal', 'Double-entry manual journal transactions'],
+                'ledger': ['General Ledger', 'Chronological transaction history per account'],
+                'trial': ['Trial Balance', 'Audit equality of total debits and credits'],
+                'profit-loss': ['Profit & Loss Statement', 'Income statement measuring sales and expenses'],
+                'balance-sheet': ['Balance Sheet Statement', 'Assets, Liabilities, and Equity verification'],
+                'settings': ['Company & Tax Settings', 'System configuration, currency, and tax setup'],
+                'users': ['Users & Permissions', 'Manage system access roles']
+            };
+
+            const [title, subtitle] = titleMap[pageId] || ['Accounting Suite', 'Phuntshok Retail'];
+            document.getElementById('pageTitle').innerText = title;
+            document.getElementById('pageSubtitle').innerText = subtitle;
+            document.getElementById('headerCurrencyBadge').innerText = `${appState.settings.currency} (${appState.settings.currencyCode})`;
+
+            renderPage(pageId);
+
+            // Close mobile menu
+            if (window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebarBackdrop').classList.add('hidden');
+            }
+        }
+
+        // View Generator
+        function renderPage(pageId) {
+            const container = document.getElementById('mainContent');
+
+            switch(pageId) {
+                case 'dashboard':
+                    const totalRev = appState.accounts.filter(a => a.type === 'Revenue').reduce((s, a) => s + a.balance, 0);
+                    const totalExp = appState.accounts.filter(a => a.type === 'Expense').reduce((s, a) => s + a.balance, 0);
+                    const netProfit = totalRev - totalExp;
+                    const totalReceivables = appState.customers.reduce((s, c) => s + c.balance, 0);
+                    const totalPayables = appState.suppliers.reduce((s, v) => s + v.balance, 0);
+                    const lowStockItems = appState.products.filter(p => p.stock <= p.minStock);
+
+                    container.innerHTML = `
+                        <!-- KPI Metric Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Sales Income</p>
+                                    <h3 class="text-2xl font-bold text-slate-900 mt-1">${fmt(totalRev)}</h3>
+                                    <p class="text-xs text-emerald-600 font-semibold mt-1">↑ Operating Revenue</p>
+                                </div>
+                                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">📈</div>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Net Profit</p>
+                                    <h3 class="text-2xl font-bold ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-600'} mt-1">${fmt(netProfit)}</h3>
+                                    <p class="text-xs text-slate-500 font-medium mt-1">Revenue minus COGS/Expenses</p>
+                                </div>
+                                <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-xl">💰</div>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Accounts Receivable</p>
+                                    <h3 class="text-2xl font-bold text-amber-600 mt-1">${fmt(totalReceivables)}</h3>
+                                    <p class="text-xs text-amber-700 font-medium mt-1">Due from Customers</p>
+                                </div>
+                                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">💵</div>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Accounts Payable</p>
+                                    <h3 class="text-2xl font-bold text-rose-600 mt-1">${fmt(totalPayables)}</h3>
+                                    <p class="text-xs text-rose-700 font-medium mt-1">Due to Suppliers</p>
+                                </div>
+                                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">💸</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart & Action Row -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <!-- Revenue vs Expenses Chart -->
+                            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-bold text-slate-800 text-base">Financial Overview Chart</h3>
+                                    <span class="text-xs text-slate-400">Monthly Performance</span>
+                                </div>
+                                <div class="h-64">
+                                    <canvas id="dashboardChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Shortcuts & Inventory Alerts -->
+                            <div class="space-y-6">
+                                <!-- Shortcuts -->
+                                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                                    <h3 class="font-bold text-slate-800 text-sm mb-3">Quick Accounting Actions</h3>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="openModal('newSale')" class="p-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl border border-emerald-200/60 text-left transition-colors">
+                                            <p class="text-lg">🧾</p>
+                                            <p class="text-xs font-bold mt-1">+ Sale Invoice</p>
+                                        </button>
+                                        <button onclick="openModal('newPurchase')" class="p-3 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-xl border border-blue-200/60 text-left transition-colors">
+                                            <p class="text-lg">🛒</p>
+                                            <p class="text-xs font-bold mt-1">+ Vendor Bill</p>
+                                        </button>
+                                        <button onclick="openModal('newReceipt')" class="p-3 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-xl border border-amber-200/60 text-left transition-colors">
+                                            <p class="text-lg">💵</p>
+                                            <p class="text-xs font-bold mt-1">+ Receive Cash</p>
+                                        </button>
+                                        <button onclick="openModal('newJournal')" class="p-3 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-xl border border-purple-200/60 text-left transition-colors">
+                                            <p class="text-lg">📒</p>
+                                            <p class="text-xs font-bold mt-1">+ Journal Entry</p>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Low Stock Warning Box -->
+                                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                            <span>Low Stock Alerts</span>
+                                            <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-bold">${lowStockItems.length}</span>
+                                        </h3>
+                                        <button onclick="navigateTo('products')" class="text-xs text-emerald-600 hover:underline font-semibold">View All →</button>
+                                    </div>
+                                    <div class="space-y-2">
+                                        ${lowStockItems.length === 0 ? '<p class="text-xs text-slate-400 italic">All product stocks are healthy.</p>' : ''}
+                                        ${lowStockItems.map(p => `
+                                            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                                                <div>
+                                                    <p class="text-xs font-semibold text-slate-800">${p.name}</p>
+                                                    <p class="text-[10px] text-slate-500">Min Reorder: ${p.minStock} units</p>
+                                                </div>
+                                                <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700">${p.stock} in stock</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Sales Table -->
+                        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-800 text-base">Recent Sales Transactions</h3>
+                                <button onclick="navigateTo('sales')" class="text-xs text-emerald-600 hover:underline font-semibold">View All Invoices →</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold tracking-wider">
+                                        <tr>
+                                            <th class="p-3">Invoice #</th>
+                                            <th class="p-3">Customer</th>
+                                            <th class="p-3">Date</th>
+                                            <th class="p-3 text-right">Total Amount</th>
+                                            <th class="p-3 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.salesInvoices.slice(0, 5).map(inv => {
+                                            const cust = appState.customers.find(c => c.id === inv.customerId);
+                                            return `
+                                                <tr class="hover:bg-slate-50">
+                                                    <td class="p-3 font-mono font-bold text-slate-800">${inv.id}</td>
+                                                    <td class="p-3 font-medium text-slate-700">${cust ? cust.name : 'Unknown'}</td>
+                                                    <td class="p-3 text-slate-500 text-xs">${inv.date}</td>
+                                                    <td class="p-3 text-right font-bold text-slate-900">${fmt(inv.total)}</td>
+                                                    <td class="p-3 text-center">
+                                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${inv.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                                            ${inv.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+
+                    // Render Chart.js
+                    setTimeout(() => {
+                        const ctx = document.getElementById('dashboardChart');
+                        if (ctx) {
+                            new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Operating Revenue', 'COGS & Operating Expenses', 'Accounts Receivable', 'Accounts Payable'],
+                                    datasets: [{
+                                        label: 'Financial Balances (' + appState.settings.currency + ')',
+                                        data: [totalRev, totalExp, totalReceivables, totalPayables],
+                                        backgroundColor: ['#10b981', '#f43f5e', '#f59e0b', '#6366f1'],
+                                        borderRadius: 8
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { display: false } }
+                                }
+                            });
+                        }
+                    }, 50);
+                    break;
+
+                case 'accounts':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex flex-wrap gap-3 justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Chart of Accounts Hierarchy</h3>
+                                    <p class="text-xs text-slate-500">Standard double-entry accounting structure</p>
+                                </div>
+                                <button onclick="openModal('newAccount')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 shadow-xs">
+                                    <span>+ Add Account</span>
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">Code</th>
+                                            <th class="p-3.5">Account Title</th>
+                                            <th class="p-3.5">Main Type</th>
+                                            <th class="p-3.5">Category</th>
+                                            <th class="p-3.5 text-right">Current Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 font-mono text-xs">
+                                        ${appState.accounts.map(acc => `
+                                            <tr class="hover:bg-slate-50/80">
+                                                <td class="p-3.5 font-bold text-emerald-700">${acc.code}</td>
+                                                <td class="p-3.5 font-sans font-semibold text-slate-800 text-sm">${acc.name}</td>
+                                                <td class="p-3.5 font-sans">
+                                                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold ${
+                                                        acc.type === 'Asset' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                                                        acc.type === 'Liability' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                                                        acc.type === 'Equity' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                                                        acc.type === 'Revenue' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                                                        'bg-amber-50 text-amber-700 border border-amber-200'
+                                                    }">
+                                                        ${acc.type}
+                                                    </span>
+                                                </td>
+                                                <td class="p-3.5 font-sans text-slate-500 text-xs">${acc.category}</td>
+                                                <td class="p-3.5 text-right font-bold font-sans text-sm text-slate-900">${fmt(acc.balance)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'customers':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Customer Accounts</h3>
+                                    <p class="text-xs text-slate-500">Track client balances and contact details</p>
+                                </div>
+                                <button onclick="openModal('newCustomer')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Add Customer
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">ID</th>
+                                            <th class="p-3.5">Customer Name</th>
+                                            <th class="p-3.5">Contact Person</th>
+                                            <th class="p-3.5">Phone / Email</th>
+                                            <th class="p-3.5 text-right">Outstanding Receivable</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.customers.map(c => `
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="p-3.5 font-mono text-xs font-bold text-slate-500">${c.id}</td>
+                                                <td class="p-3.5 font-semibold text-slate-800">${c.name}</td>
+                                                <td class="p-3.5 text-slate-600">${c.contact}</td>
+                                                <td class="p-3.5 text-xs text-slate-500">${c.phone}<br>${c.email}</td>
+                                                <td class="p-3.5 text-right font-bold text-amber-600">${fmt(c.balance)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'suppliers':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Suppliers & Vendors</h3>
+                                    <p class="text-xs text-slate-500">Manage vendor contact info and accounts payable</p>
+                                </div>
+                                <button onclick="openModal('newSupplier')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Add Supplier
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">ID</th>
+                                            <th class="p-3.5">Supplier Name</th>
+                                            <th class="p-3.5">Contact Representative</th>
+                                            <th class="p-3.5">Phone / Email</th>
+                                            <th class="p-3.5 text-right">Payable Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.suppliers.map(s => `
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="p-3.5 font-mono text-xs font-bold text-slate-500">${s.id}</td>
+                                                <td class="p-3.5 font-semibold text-slate-800">${s.name}</td>
+                                                <td class="p-3.5 text-slate-600">${s.contact}</td>
+                                                <td class="p-3.5 text-xs text-slate-500">${s.phone}<br>${s.email}</td>
+                                                <td class="p-3.5 text-right font-bold text-rose-600">${fmt(s.balance)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'products':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Products & Inventory Master</h3>
+                                    <p class="text-xs text-slate-500">Manage stock quantities, pricing, and reorder alerts</p>
+                                </div>
+                                <button onclick="openModal('newProduct')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Add Product
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">Code</th>
+                                            <th class="p-3.5">Item Name</th>
+                                            <th class="p-3.5">Category</th>
+                                            <th class="p-3.5 text-right">Sale Price</th>
+                                            <th class="p-3.5 text-right">Cost Price</th>
+                                            <th class="p-3.5 text-center">Stock Level</th>
+                                            <th class="p-3.5 text-right">Inventory Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.products.map(p => `
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="p-3.5 font-mono text-xs font-bold text-slate-500">${p.code}</td>
+                                                <td class="p-3.5 font-semibold text-slate-800">${p.name}</td>
+                                                <td class="p-3.5 text-xs text-slate-500">${p.category}</td>
+                                                <td class="p-3.5 text-right font-medium">${fmt(p.price)}</td>
+                                                <td class="p-3.5 text-right text-slate-500">${fmt(p.cost)}</td>
+                                                <td class="p-3.5 text-center">
+                                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold ${p.stock <= p.minStock ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">
+                                                        ${p.stock} units
+                                                    </span>
+                                                </td>
+                                                <td class="p-3.5 text-right font-bold text-slate-900">${fmt(p.stock * p.cost)}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'sales':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Sales Invoices</h3>
+                                    <p class="text-xs text-slate-500">Manage billing and sales receivables</p>
+                                </div>
+                                <button onclick="openModal('newSale')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Create Sales Invoice
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">Invoice #</th>
+                                            <th class="p-3.5">Customer</th>
+                                            <th class="p-3.5">Date</th>
+                                            <th class="p-3.5 text-right">Subtotal</th>
+                                            <th class="p-3.5 text-right">Tax (${appState.settings.taxRate}%)</th>
+                                            <th class="p-3.5 text-right">Total</th>
+                                            <th class="p-3.5 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.salesInvoices.map(s => {
+                                            const cust = appState.customers.find(c => c.id === s.customerId);
+                                            return `
+                                                <tr class="hover:bg-slate-50">
+                                                    <td class="p-3.5 font-mono text-xs font-bold text-slate-800">${s.id}</td>
+                                                    <td class="p-3.5 font-semibold text-slate-700">${cust ? cust.name : 'N/A'}</td>
+                                                    <td class="p-3.5 text-xs text-slate-500">${s.date}</td>
+                                                    <td class="p-3.5 text-right text-slate-600">${fmt(s.subtotal)}</td>
+                                                    <td class="p-3.5 text-right text-slate-500">${fmt(s.tax)}</td>
+                                                    <td class="p-3.5 text-right font-bold text-slate-900">${fmt(s.total)}</td>
+                                                    <td class="p-3.5 text-center">
+                                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                                            ${s.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'purchases':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Purchase Orders & Bills</h3>
+                                    <p class="text-xs text-slate-500">Record incoming stock and supplier bills</p>
+                                </div>
+                                <button onclick="openModal('newPurchase')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Record Purchase Order
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">Bill #</th>
+                                            <th class="p-3.5">Supplier</th>
+                                            <th class="p-3.5">Date</th>
+                                            <th class="p-3.5 text-right">Total Amount</th>
+                                            <th class="p-3.5 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.purchaseBills.map(p => {
+                                            const supp = appState.suppliers.find(s => s.id === p.supplierId);
+                                            return `
+                                                <tr class="hover:bg-slate-50">
+                                                    <td class="p-3.5 font-mono text-xs font-bold text-slate-800">${p.id}</td>
+                                                    <td class="p-3.5 font-semibold text-slate-700">${supp ? supp.name : 'N/A'}</td>
+                                                    <td class="p-3.5 text-xs text-slate-500">${p.date}</td>
+                                                    <td class="p-3.5 text-right font-bold text-slate-900">${fmt(p.total)}</td>
+                                                    <td class="p-3.5 text-center">
+                                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${p.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                                            ${p.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'receipts':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Customer Payment Receipts</h3>
+                                    <p class="text-xs text-slate-500">Incoming collection records reducing customer balance</p>
+                                </div>
+                                <button onclick="openModal('newReceipt')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Record Receipt
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">Receipt #</th>
+                                            <th class="p-3.5">Customer</th>
+                                            <th class="p-3.5">Payment Method</th>
+                                            <th class="p-3.5">Reference #</th>
+                                            <th class="p-3.5">Date</th>
+                                            <th class="p-3.5 text-right">Amount Received</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.receipts.map(r => {
+                                            const cust = appState.customers.find(c => c.id === r.customerId);
+                                            return `
+                                                <tr class="hover:bg-slate-50">
+                                                    <td class="p-3.5 font-mono text-xs font-bold text-slate-800">${r.id}</td>
+                                                    <td class="p-3.5 font-semibold text-slate-700">${cust ? cust.name : 'N/A'}</td>
+                                                    <td class="p-3.5 text-xs font-medium text-slate-600">${r.method}</td>
+                                                    <td class="p-3.5 font-mono text-xs text-slate-500">${r.ref || '-'}</td>
+                                                    <td class="p-3.5 text-xs text-slate-500">${r.date}</td>
+                                                    <td class="p-3.5 text-right font-bold text-emerald-600">${fmt(r.amount)}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'payments':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Supplier Disbursements</h3>
+                                    <p class="text-xs text-slate-500">Outgoing payment log settling vendor accounts payable</p>
+                                </div>
+                                <button onclick="openModal('newPayment')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Record Supplier Payment
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">Payment #</th>
+                                            <th class="p-3.5">Supplier</th>
+                                            <th class="p-3.5">Method</th>
+                                            <th class="p-3.5">Reference #</th>
+                                            <th class="p-3.5">Date</th>
+                                            <th class="p-3.5 text-right">Amount Paid</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.payments.map(p => {
+                                            const supp = appState.suppliers.find(s => s.id === p.supplierId);
+                                            return `
+                                                <tr class="hover:bg-slate-50">
+                                                    <td class="p-3.5 font-mono text-xs font-bold text-slate-800">${p.id}</td>
+                                                    <td class="p-3.5 font-semibold text-slate-700">${supp ? supp.name : 'N/A'}</td>
+                                                    <td class="p-3.5 text-xs font-medium text-slate-600">${p.method}</td>
+                                                    <td class="p-3.5 font-mono text-xs text-slate-500">${p.ref || '-'}</td>
+                                                    <td class="p-3.5 text-xs text-slate-500">${p.date}</td>
+                                                    <td class="p-3.5 text-right font-bold text-rose-600">${fmt(p.amount)}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'journal':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">General Journal Entries</h3>
+                                    <p class="text-xs text-slate-500">Double-entry debit and credit manual journal register</p>
+                                </div>
+                                <button onclick="openModal('newJournal')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + New Journal Entry
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">Ref #</th>
+                                            <th class="p-3.5">Date</th>
+                                            <th class="p-3.5">Description</th>
+                                            <th class="p-3.5">Debit Account</th>
+                                            <th class="p-3.5">Credit Account</th>
+                                            <th class="p-3.5 text-right">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.journalEntries.map(j => {
+                                            const dbAcc = appState.accounts.find(a => a.code === j.debitCode);
+                                            const crAcc = appState.accounts.find(a => a.code === j.creditCode);
+                                            return `
+                                                <tr class="hover:bg-slate-50">
+                                                    <td class="p-3.5 font-mono text-xs font-bold text-slate-800">${j.id}</td>
+                                                    <td class="p-3.5 text-xs text-slate-500">${j.date}</td>
+                                                    <td class="p-3.5 font-medium text-slate-800">${j.desc}</td>
+                                                    <td class="p-3.5 font-mono text-xs text-emerald-700">${dbAcc ? `[${dbAcc.code}] ${dbAcc.name}` : j.debitCode}</td>
+                                                    <td class="p-3.5 font-mono text-xs text-rose-700">${crAcc ? `[${crAcc.code}] ${crAcc.name}` : j.creditCode}</td>
+                                                    <td class="p-3.5 text-right font-bold text-slate-900">${fmt(j.amount)}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'ledger':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-5xl mx-auto">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-lg">General Ledger Accounts</h3>
+                                    <p class="text-xs text-slate-500">Comprehensive audit trail for each ledger code</p>
+                                </div>
+                                <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3 py-2 rounded-lg transition-colors border">
+                                    🖨️ Print Ledger Report
+                                </button>
+                            </div>
+                            <div class="space-y-6">
+                                ${appState.accounts.map(acc => {
+                                    const related = appState.journalEntries.filter(j => j.debitCode === acc.code || j.creditCode === acc.code);
+                                    return `
+                                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                                            <div class="bg-slate-100 p-3.5 font-semibold text-slate-800 flex justify-between items-center text-sm">
+                                                <span>Account Code: <strong class="text-emerald-700 font-mono">${acc.code}</strong> — ${acc.name} (${acc.type})</span>
+                                                <span class="text-xs bg-white px-2.5 py-1 rounded-lg border font-bold">Balance: ${fmt(acc.balance)}</span>
+                                            </div>
+                                            <div class="p-3 bg-white">
+                                                ${related.length === 0 ? '<p class="text-xs text-slate-400 italic">No manual journal postings for this account.</p>' : `
+                                                    <table class="w-full text-xs text-left">
+                                                        <thead class="text-slate-400 border-b">
+                                                            <tr>
+                                                                <th class="p-1.5">Date</th>
+                                                                <th class="p-1.5">Ref</th>
+                                                                <th class="p-1.5">Description</th>
+                                                                <th class="p-1.5 text-right">Debit / Credit</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="divide-y divide-slate-100">
+                                                            ${related.map(r => `
+                                                                <tr>
+                                                                    <td class="p-1.5 text-slate-500">${r.date}</td>
+                                                                    <td class="p-1.5 font-mono">${r.id}</td>
+                                                                    <td class="p-1.5 font-medium">${r.desc}</td>
+                                                                    <td class="p-1.5 text-right font-mono font-bold ${r.debitCode === acc.code ? 'text-emerald-700' : 'text-rose-600'}">
+                                                                        ${r.debitCode === acc.code ? `+${fmt(r.amount)} Dr` : `-${fmt(r.amount)} Cr`}
+                                                                    </td>
+                                                                </tr>
+                                                            `).join('')}
+                                                        </tbody>
+                                                    </table>
+                                                `}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'trial':
+                    const drSum = appState.accounts.filter(a => ['Asset', 'Expense'].includes(a.type)).reduce((s, a) => s + a.balance, 0);
+                    const crSum = appState.accounts.filter(a => ['Liability', 'Equity', 'Revenue'].includes(a.type)).reduce((s, a) => s + a.balance, 0);
+                    const isBalanced = Math.abs(drSum - crSum) < 0.01;
+
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-8 max-w-4xl mx-auto">
+                            <div class="text-center pb-6 border-b border-slate-200">
+                                <h2 class="text-2xl font-bold text-slate-900">${appState.settings.companyName}</h2>
+                                <h3 class="text-base font-semibold text-emerald-700 mt-1">Trial Balance Audit Statement</h3>
+                                <p class="text-xs text-slate-400 mt-1">Generated: ${new Date().toLocaleDateString()}</p>
+                            </div>
+
+                            <div class="my-4 p-3 rounded-xl ${isBalanced ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'} text-xs font-semibold text-center">
+                                ${isBalanced ? '✓ Double-Entry Ledger is Perfectly Balanced! Total Debits equal Total Credits.' : '⚠️ Warning: Ledger imbalance detected. Please review journal postings.'}
+                            </div>
+
+                            <div class="overflow-x-auto mt-4">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-700 font-semibold uppercase text-xs">
+                                        <tr>
+                                            <th class="p-3">Account Title</th>
+                                            <th class="p-3 text-right">Debit Balance (${appState.settings.currency})</th>
+                                            <th class="p-3 text-right">Credit Balance (${appState.settings.currency})</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 font-mono text-xs">
+                                        ${appState.accounts.map(a => {
+                                            const isDr = ['Asset', 'Expense'].includes(a.type);
+                                            return `
+                                                <tr>
+                                                    <td class="p-3 font-sans font-medium text-slate-800 text-sm">[${a.code}] ${a.name}</td>
+                                                    <td class="p-3 text-right font-bold text-slate-900">${isDr ? fmt(a.balance) : '-'}</td>
+                                                    <td class="p-3 text-right font-bold text-slate-900">${!isDr ? fmt(a.balance) : '-'}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                    <tfoot class="border-t-2 border-slate-900 bg-slate-50 font-bold text-sm">
+                                        <tr>
+                                            <td class="p-3.5 text-slate-900 uppercase">Total Trial Balance</td>
+                                            <td class="p-3.5 text-right font-mono text-emerald-700">${fmt(drSum)}</td>
+                                            <td class="p-3.5 text-right font-mono text-emerald-700">${fmt(crSum)}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'profit-loss':
+                    const revAccounts = appState.accounts.filter(a => a.type === 'Revenue');
+                    const expAccounts = appState.accounts.filter(a => a.type === 'Expense');
+                    const revTotal = revAccounts.reduce((s, a) => s + a.balance, 0);
+                    const expTotal = expAccounts.reduce((s, a) => s + a.balance, 0);
+                    const netIncomeVal = revTotal - expTotal;
+
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-8 max-w-3xl mx-auto">
+                            <div class="text-center pb-6 border-b border-slate-200">
+                                <h2 class="text-2xl font-bold text-slate-900">${appState.settings.companyName}</h2>
+                                <h3 class="text-base font-semibold text-slate-600 mt-1">Profit & Loss Statement (Income Statement)</h3>
+                                <p class="text-xs text-slate-400 mt-1">For Period Ending ${new Date().toLocaleDateString()}</p>
+                            </div>
+
+                            <div class="mt-6 space-y-6 text-sm">
+                                <div>
+                                    <h4 class="font-bold text-slate-900 uppercase text-xs tracking-wider border-b-2 border-emerald-600 pb-2 mb-3">Revenues & Sales Income</h4>
+                                    ${revAccounts.map(a => `
+                                        <div class="flex justify-between py-1.5 text-slate-700 border-b border-slate-50">
+                                            <span>[${a.code}] ${a.name}</span>
+                                            <span class="font-mono font-medium">${fmt(a.balance)}</span>
+                                        </div>
+                                    `).join('')}
+                                    <div class="flex justify-between py-2 border-t font-bold text-emerald-700 mt-2">
+                                        <span>Total Income</span>
+                                        <span class="font-mono">${fmt(revTotal)}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 class="font-bold text-slate-900 uppercase text-xs tracking-wider border-b-2 border-rose-600 pb-2 mb-3">Cost of Sales & Operating Expenses</h4>
+                                    ${expAccounts.map(a => `
+                                        <div class="flex justify-between py-1.5 text-slate-700 border-b border-slate-50">
+                                            <span>[${a.code}] ${a.name}</span>
+                                            <span class="font-mono font-medium">${fmt(a.balance)}</span>
+                                        </div>
+                                    `).join('')}
+                                    <div class="flex justify-between py-2 border-t font-bold text-rose-700 mt-2">
+                                        <span>Total Expenses</span>
+                                        <span class="font-mono">${fmt(expTotal)}</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-5 bg-slate-900 text-white rounded-2xl flex justify-between items-center font-bold text-lg shadow-lg">
+                                    <span>Net Earnings / (Loss)</span>
+                                    <span class="font-mono ${netIncomeVal >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${fmt(netIncomeVal)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'balance-sheet':
+                    const assetAccs = appState.accounts.filter(a => a.type === 'Asset');
+                    const liabAccs = appState.accounts.filter(a => a.type === 'Liability');
+                    const eqAccs = appState.accounts.filter(a => a.type === 'Equity');
+
+                    const totalA = assetAccs.reduce((s, a) => s + a.balance, 0);
+                    const totalL = liabAccs.reduce((s, a) => s + a.balance, 0);
+                    const totalE = eqAccs.reduce((s, a) => s + a.balance, 0);
+
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-8 max-w-4xl mx-auto">
+                            <div class="text-center pb-6 border-b border-slate-200">
+                                <h2 class="text-2xl font-bold text-slate-900">${appState.settings.companyName}</h2>
+                                <h3 class="text-base font-semibold text-slate-600 mt-1">Balance Sheet Statement</h3>
+                                <p class="text-xs text-slate-400 mt-1">Financial Position as of Today</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 text-sm">
+                                <div>
+                                    <h4 class="font-bold text-slate-900 uppercase text-xs tracking-wider border-b-2 border-emerald-600 pb-2 mb-3">Total Assets</h4>
+                                    <div class="space-y-2">
+                                        ${assetAccs.map(a => `
+                                            <div class="flex justify-between py-1 text-slate-700 border-b border-slate-50">
+                                                <span>${a.name}</span>
+                                                <span class="font-mono font-medium">${fmt(a.balance)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="mt-6 pt-3 border-t-2 border-slate-900 flex justify-between font-bold text-emerald-800 text-base">
+                                        <span>Total Assets</span>
+                                        <span class="font-mono">${fmt(totalA)}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 class="font-bold text-slate-900 uppercase text-xs tracking-wider border-b-2 border-slate-900 pb-2 mb-3">Liabilities & Owner Equity</h4>
+                                    
+                                    <p class="text-xs font-bold text-slate-400 uppercase mt-2 mb-1">Liabilities</p>
+                                    <div class="space-y-1.5">
+                                        ${liabAccs.map(a => `
+                                            <div class="flex justify-between py-1 text-slate-700 border-b border-slate-50">
+                                                <span>${a.name}</span>
+                                                <span class="font-mono font-medium">${fmt(a.balance)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+
+                                    <p class="text-xs font-bold text-slate-400 uppercase mt-4 mb-1">Owner Equity</p>
+                                    <div class="space-y-1.5">
+                                        ${eqAccs.map(a => `
+                                            <div class="flex justify-between py-1 text-slate-700 border-b border-slate-50">
+                                                <span>${a.name}</span>
+                                                <span class="font-mono font-medium">${fmt(a.balance)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+
+                                    <div class="mt-6 pt-3 border-t-2 border-slate-900 flex justify-between font-bold text-slate-900 text-base">
+                                        <span>Total Liabilities & Equity</span>
+                                        <span class="font-mono">${fmt(totalL + totalE)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'settings':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 max-w-xl mx-auto">
+                            <h3 class="font-bold text-slate-800 text-lg mb-4 pb-2 border-b">Company & Tax Configuration</h3>
+                            <form onsubmit="handleSaveSettings(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Company Trade Name</label>
+                                    <input type="text" id="cfgCompany" value="${appState.settings.companyName}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tax Identification Number (TPN/VAT)</label>
+                                    <input type="text" id="cfgTaxNum" value="${appState.settings.taxNumber}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Currency Symbol</label>
+                                        <input type="text" id="cfgCurr" value="${appState.settings.currency}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Sales Tax Rate (%)</label>
+                                        <input type="number" step="0.1" id="cfgTaxRate" value="${appState.settings.taxRate}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Physical Address</label>
+                                    <textarea id="cfgAddress" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" rows="2">${appState.settings.address}</textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-sm transition-colors shadow-xs">
+                                    Save Configurations
+                                </button>
+                            </form>
+                        </div>
+                    `;
+                    break;
+
+                case 'users':
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-base">Authorized Personnel</h3>
+                                    <p class="text-xs text-slate-500">Manage user credentials and permission roles</p>
+                                </div>
+                                <button onclick="openModal('newUser')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-xs">
+                                    + Add User
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                        <tr>
+                                            <th class="p-3.5">User Full Name</th>
+                                            <th class="p-3.5">Role</th>
+                                            <th class="p-3.5">Email</th>
+                                            <th class="p-3.5 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${appState.users.map(u => `
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="p-3.5 font-semibold text-slate-800">${u.name}</td>
+                                                <td class="p-3.5 text-slate-600 text-xs font-medium">${u.role}</td>
+                                                <td class="p-3.5 text-slate-500 text-xs">${u.email}</td>
+                                                <td class="p-3.5 text-center">
+                                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">${u.status}</span>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        // Global Modal Handlers
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.add('hidden');
+        }
+
+        function openModal(type) {
+            const backdrop = document.getElementById('modalBackdrop');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            backdrop.classList.remove('hidden');
+
+            switch(type) {
+                case 'newCustomer':
+                    title.innerText = "Add New Customer";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateCustomer(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Customer / Business Name</label>
+                                <input id="mCustName" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Person</label>
+                                <input id="mCustContact" type="text" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Number</label>
+                                    <input id="mCustPhone" type="text" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email Address</label>
+                                    <input id="mCustEmail" type="email" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Save Customer
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newSupplier':
+                    title.innerText = "Add New Supplier";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateSupplier(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Supplier / Vendor Name</label>
+                                <input id="mSuppName" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Representative</label>
+                                <input id="mSuppContact" type="text" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Phone</label>
+                                    <input id="mSuppPhone" type="text" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                                    <input id="mSuppEmail" type="email" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Save Supplier
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newProduct':
+                    title.innerText = "Add New Product";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateProduct(event)" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">SKU / Item Code</label>
+                                    <input id="mProdCode" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+                                    <input id="mProdCat" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Product Description</label>
+                                <input id="mProdName" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Selling Price</label>
+                                    <input id="mProdPrice" type="number" step="0.01" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Cost Price</label>
+                                    <input id="mProdCost" type="number" step="0.01" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Opening Stock</label>
+                                    <input id="mProdStock" type="number" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Save Inventory Product
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newSale':
+                    title.innerText = "Create Sales Invoice";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateSale(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Select Customer</label>
+                                <select id="mSaleCust" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    ${appState.customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Select Product Item</label>
+                                <select id="mSaleProd" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    ${appState.products.map(p => `<option value="${p.id}">${p.name} (${fmt(p.price)}) — ${p.stock} in stock</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Quantity</label>
+                                    <input id="mSaleQty" type="number" min="1" value="1" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Invoice Date</label>
+                                    <input id="mSaleDate" type="date" value="${new Date().toISOString().split('T')[0]}" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Post Sales Invoice
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newPurchase':
+                    title.innerText = "Record Vendor Purchase Order";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreatePurchase(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Select Supplier</label>
+                                <select id="mPurSupp" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    ${appState.suppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Select Product Item</label>
+                                <select id="mPurProd" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    ${appState.products.map(p => `<option value="${p.id}">${p.name} (Cost: ${fmt(p.cost)})</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Quantity Purchased</label>
+                                    <input id="mPurQty" type="number" min="1" value="10" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Bill Date</label>
+                                    <input id="mPurDate" type="date" value="${new Date().toISOString().split('T')[0]}" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Post Vendor Bill & Restock
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newReceipt':
+                    title.innerText = "Record Customer Payment Receipt";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateReceipt(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Select Customer</label>
+                                <select id="mRecCust" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    ${appState.customers.map(c => `<option value="${c.id}">${c.name} (Due: ${fmt(c.balance)})</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Payment Method</label>
+                                    <select id="mRecMethod" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        <option value="BNB Bank Transfer">BNB Bank Transfer</option>
+                                        <option value="Cash on Hand">Cash on Hand</option>
+                                        <option value="mBOB Mobile Transfer">mBOB Mobile Transfer</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Amount Received</label>
+                                    <input id="mRecAmount" type="number" step="0.01" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Post Receipt Entry
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newPayment':
+                    title.innerText = "Record Supplier Payment";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreatePayment(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Select Supplier</label>
+                                <select id="mPaySupp" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    ${appState.suppliers.map(s => `<option value="${s.id}">${s.name} (Owed: ${fmt(s.balance)})</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Payment Method</label>
+                                    <select id="mPayMethod" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        <option value="BNB Bank Transfer">BNB Bank Transfer</option>
+                                        <option value="Cash on Hand">Cash on Hand</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Disbursement Amount</label>
+                                    <input id="mPayAmount" type="number" step="0.01" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Post Disbursement
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newJournal':
+                    title.innerText = "Post Manual Journal Entry";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateJournal(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Transaction Description</label>
+                                <input id="mJrnDesc" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Debit Account (+)</label>
+                                    <select id="mJrnDebit" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        ${appState.accounts.map(a => `<option value="${a.code}">[${a.code}] ${a.name}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Credit Account (-)</label>
+                                    <select id="mJrnCredit" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        ${appState.accounts.map(a => `<option value="${a.code}">[${a.code}] ${a.name}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Amount</label>
+                                <input id="mJrnAmount" type="number" step="0.01" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Post Double-Entry Journal
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newAccount':
+                    title.innerText = "Add New Account to Hierarchy";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateAccount(event)" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Account Code</label>
+                                    <input id="mAccCode" type="text" placeholder="e.g. 1030" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Main Type</label>
+                                    <select id="mAccType" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        <option value="Asset">Asset</option>
+                                        <option value="Liability">Liability</option>
+                                        <option value="Equity">Equity</option>
+                                        <option value="Revenue">Revenue</option>
+                                        <option value="Expense">Expense</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Account Title</label>
+                                <input id="mAccName" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Category Group</label>
+                                <input id="mAccCat" type="text" placeholder="e.g. Current Asset" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Save Account
+                            </button>
+                        </form>
+                    `;
+                    break;
+
+                case 'newUser':
+                    title.innerText = "Add System User";
+                    body.innerHTML = `
+                        <form onsubmit="handleCreateUser(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name</label>
+                                <input id="mUserName" type="text" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                                <input id="mUserEmail" type="email" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">User Role</label>
+                                <select id="mUserRole" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    <option value="Accountant">Accountant</option>
+                                    <option value="Store Manager">Store Manager</option>
+                                    <option value="Administrator">Administrator</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors mt-2">
+                                Create User
+                            </button>
+                        </form>
+                    `;
+                    break;
+            }
+        }
+
+        // Form Event Submit Handlers
+        function handleCreateCustomer(e) {
+            e.preventDefault();
+            const name = document.getElementById('mCustName').value;
+            const contact = document.getElementById('mCustContact').value;
+            const phone = document.getElementById('mCustPhone').value;
+            const email = document.getElementById('mCustEmail').value;
+            const id = 'CUST-' + (101 + appState.customers.length);
+
+            appState.customers.push({ id, name, contact, phone, email, balance: 0 });
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreateSupplier(e) {
+            e.preventDefault();
+            const name = document.getElementById('mSuppName').value;
+            const contact = document.getElementById('mSuppContact').value;
+            const phone = document.getElementById('mSuppPhone').value;
+            const email = document.getElementById('mSuppEmail').value;
+            const id = 'SUPP-' + (201 + appState.suppliers.length);
+
+            appState.suppliers.push({ id, name, contact, phone, email, balance: 0 });
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreateProduct(e) {
+            e.preventDefault();
+            const code = document.getElementById('mProdCode').value;
+            const category = document.getElementById('mProdCat').value;
+            const name = document.getElementById('mProdName').value;
+            const price = parseFloat(document.getElementById('mProdPrice').value) || 0;
+            const cost = parseFloat(document.getElementById('mProdCost').value) || 0;
+            const stock = parseInt(document.getElementById('mProdStock').value) || 0;
+            const id = 'PROD-0' + (appState.products.length + 1);
+
+            appState.products.push({ id, code, name, category, price, cost, stock, minStock: 5 });
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreateSale(e) {
+            e.preventDefault();
+            const custId = document.getElementById('mSaleCust').value;
+            const prodId = document.getElementById('mSaleProd').value;
+            const qty = parseInt(document.getElementById('mSaleQty').value) || 1;
+            const date = document.getElementById('mSaleDate').value;
+
+            const product = appState.products.find(p => p.id === prodId);
+            const customer = appState.customers.find(c => c.id === custId);
+            if (!product || !customer) return;
+
+            const subtotal = product.price * qty;
+            const tax = subtotal * (appState.settings.taxRate / 100);
+            const total = subtotal + tax;
+
+            const invId = 'INV-' + (1001 + appState.salesInvoices.length);
+
+            // Record Sales Invoice
+            appState.salesInvoices.unshift({ id: invId, customerId: custId, date, items: [{ productId: prodId, qty, price: product.price, total: subtotal }], subtotal, tax, total, status: 'Unpaid' });
+
+            // Update Customer Balance
+            customer.balance += total;
+
+            // Reduce Product Inventory Stock
+            product.stock = Math.max(0, product.stock - qty);
+
+            // Double Entry Post: Debit Accounts Receivable (1100), Credit Retail Sales Income (4010)
+            postDoubleEntry(date, `Sales Invoice ${invId} to ${customer.name}`, '1100', '4010', subtotal);
+
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreatePurchase(e) {
+            e.preventDefault();
+            const suppId = document.getElementById('mPurSupp').value;
+            const prodId = document.getElementById('mPurProd').value;
+            const qty = parseInt(document.getElementById('mPurQty').value) || 1;
+            const date = document.getElementById('mPurDate').value;
+
+            const product = appState.products.find(p => p.id === prodId);
+            const supplier = appState.suppliers.find(s => s.id === suppId);
+            if (!product || !supplier) return;
+
+            const total = product.cost * qty;
+            const billId = 'BILL-' + (5001 + appState.purchaseBills.length);
+
+            // Add Bill Record
+            appState.purchaseBills.unshift({ id: billId, supplierId: suppId, date, items: [{ productId: prodId, qty, cost: product.cost, total }], total, status: 'Pending' });
+
+            // Increase Supplier Balance
+            supplier.balance += total;
+
+            // Restock Product Quantity
+            product.stock += qty;
+
+            // Double Entry Post: Debit Inventory Asset (1200), Credit Accounts Payable (2010)
+            postDoubleEntry(date, `Vendor Bill ${billId} from ${supplier.name}`, '1200', '2010', total);
+
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreateReceipt(e) {
+            e.preventDefault();
+            const custId = document.getElementById('mRecCust').value;
+            const method = document.getElementById('mRecMethod').value;
+            const amount = parseFloat(document.getElementById('mRecAmount').value) || 0;
+            const date = new Date().toISOString().split('T')[0];
+
+            const customer = appState.customers.find(c => c.id === custId);
+            if (!customer) return;
+
+            const recId = 'REC-' + (301 + appState.receipts.length);
+            appState.receipts.unshift({ id: recId, customerId: custId, amount, date, method, ref: 'TXN-' + Math.floor(10000 + Math.random() * 90000) });
+
+            // Reduce Customer Receivable
+            customer.balance = Math.max(0, customer.balance - amount);
+
+            // Double Entry Post: Debit Cash/Bank (1020), Credit Accounts Receivable (1100)
+            const debitAccountCode = method.includes('Cash') ? '1010' : '1020';
+            postDoubleEntry(date, `Payment received from ${customer.name}`, debitAccountCode, '1100', amount);
+
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreatePayment(e) {
+            e.preventDefault();
+            const suppId = document.getElementById('mPaySupp').value;
+            const method = document.getElementById('mPayMethod').value;
+            const amount = parseFloat(document.getElementById('mPayAmount').value) || 0;
+            const date = new Date().toISOString().split('T')[0];
+
+            const supplier = appState.suppliers.find(s => s.id === suppId);
+            if (!supplier) return;
+
+            const payId = 'PAY-' + (401 + appState.payments.length);
+            appState.payments.unshift({ id: payId, supplierId: suppId, amount, date, method, ref: 'TXN-' + Math.floor(10000 + Math.random() * 90000) });
+
+            // Reduce Supplier Owed
+            supplier.balance = Math.max(0, supplier.balance - amount);
+
+            // Double Entry Post: Debit Accounts Payable (2010), Credit Cash/Bank
+            const creditAccountCode = method.includes('Cash') ? '1010' : '1020';
+            postDoubleEntry(date, `Payment to vendor ${supplier.name}`, '2010', creditAccountCode, amount);
+
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreateJournal(e) {
+            e.preventDefault();
+            const desc = document.getElementById('mJrnDesc').value;
+            const debitCode = document.getElementById('mJrnDebit').value;
+            const creditCode = document.getElementById('mJrnCredit').value;
+            const amount = parseFloat(document.getElementById('mJrnAmount').value) || 0;
+            const date = new Date().toISOString().split('T')[0];
+
+            postDoubleEntry(date, desc, debitCode, creditCode, amount);
+
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreateAccount(e) {
+            e.preventDefault();
+            const code = document.getElementById('mAccCode').value;
+            const type = document.getElementById('mAccType').value;
+            const name = document.getElementById('mAccName').value;
+            const category = document.getElementById('mAccCat').value;
+
+            appState.accounts.push({ code, name, type, category, balance: 0 });
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleCreateUser(e) {
+            e.preventDefault();
+            const name = document.getElementById('mUserName').value;
+            const email = document.getElementById('mUserEmail').value;
+            const role = document.getElementById('mUserRole').value;
+
+            appState.users.push({ name, email, role, status: 'Active' });
+            saveState();
+            closeModal();
+            renderPage(currentPage);
+        }
+
+        function handleSaveSettings(e) {
+            e.preventDefault();
+            appState.settings.companyName = document.getElementById('cfgCompany').value;
+            appState.settings.taxNumber = document.getElementById('cfgTaxNum').value;
+            appState.settings.currency = document.getElementById('cfgCurr').value;
+            appState.settings.taxRate = parseFloat(document.getElementById('cfgTaxRate').value) || 0;
+            appState.settings.address = document.getElementById('cfgAddress').value;
+
+            saveState();
+            alert("Configurations saved!");
+            renderPage('settings');
+        }
+
+        // Initialize App View
+        window.addEventListener('DOMContentLoaded', () => {
+            navigateTo('dashboard');
+        });
+    </script>
+</body>
+</html>
